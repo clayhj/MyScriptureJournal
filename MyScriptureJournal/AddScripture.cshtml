@@ -1,0 +1,67 @@
+﻿@{
+
+    Page.Title = "Add Scripture";
+    Layout = "~/_Layout.cshtml";
+
+
+    Validation.RequireField("book", "You must enter a book");
+    Validation.RequireField("chapter", "You must enter a chapter");
+    Validation.RequireField("verse", "You must enter a verse");
+    Validation.RequireField("note", "You must enter a note");
+
+    var book = "";
+    int chapter;
+    int verse;
+    string note = "";
+    DateTime date;
+
+    if (IsPost && Validation.IsValid())
+    {
+        book = Request.Form["book"];
+        chapter = Request.Form["chapter"].AsInt();
+        verse = Request.Form["verse"].AsInt();
+        note = Request.Form["note"];
+        date = DateTime.Now;
+
+        var db = Database.OpenConnectionString("Data Source=|DataDirectory|\\ScripturesDatabase.sdf", "System.Data.SqlServerCe.4.0");
+        var insertCommand = "INSERT INTO Scriptures (Book, Chapter, Verse, Note, Date) VALUES(@0, @1, @2, @3, @4)";
+        db.Execute(insertCommand, book, chapter, verse, note, date);
+        Response.Redirect("~/Scriptures");
+    }
+}
+
+
+
+    <h2>Add Favorite Scripture</h2>
+    @Html.ValidationSummary()
+    <form method="post">
+
+            <fieldset>
+                <legend>Scripture Information</legend>
+                <p>
+                    <label for="book">Book:</label>
+                    <input type="text" name="book" maxlength="40" value="@Request.Form["book"]" />
+                    @Html.ValidationMessage("book")
+                </p>
+
+                <p>
+                    <label for="chapter">Chapter:</label>
+                    <input type="number" name="chapter" min="1" value="@Request.Form["chapter"]" />
+                    @Html.ValidationMessage("chapter")
+                </p>
+
+                <p>
+                    <label for="verse">Verse:</label>
+                    <input type="number" name="verse" min="1" value="@Request.Form["verse"]" />
+                    @Html.ValidationMessage("verse")
+                </p>
+
+                <p>
+                    <label for="note">Note:</label>
+                    <input type="text" name="note" maxlength="200" value="@Request.Form["note"]" />
+                    @Html.ValidationMessage("note")
+                </p>
+
+                <p><input type="submit" name="buttonSubmit" value="Add Scripture" /></p>
+            </fieldset>
+    </form>
